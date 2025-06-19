@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Findr | Your Smart Property Search</title>
+    
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="The new way to search for property in Australia with AI-powered search">
+    <meta name="theme-color" content="#6366f1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="apple-mobile-web-app-title" content="Findr">
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="manifest.json">
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgwIiBoZWlnaHQ9IjE4MCIgdmlld0JveD0iMCAwIDE4MCAxODAiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyZWN0IHdpZHRoPSIxODAiIGhlaWdodD0iMTgwIiByeD0iMjAiIGZpbGw9IiM2MzY2ZjEiLz4KPHN2ZyB4PSI0NSIgeT0iNDUiIHdpZHRoPSI5MCIgaGVpZ2h0PSI5MCIgdmlld0JveD0iMCAwIDI0IDI0IiBmaWxsPSJ3aGl0ZSI+CjxwYXRoIGQ9Ik0xMiAyQzYuNDggMiAyIDYuNDggMiAxMnM0LjQ4IDEwIDEwIDEwIDEwLTQuNDggMTAtMTBTMTcuNTIgMiAxMiAyeiIvPgo8cGF0aCBkPSJNMTIgN2MtMi43NiAwLTUgMi4yNC01IDVzMi4yNCA1IDUgNS01LTIuMjQtNS01IDIuMjQtNSA1LTV6Ii8+CjxwYXRoIGQ9Ik0xMiAxNGMtMS42NiAwLTMtMS4zNC0zLTMgMC0xLjY2IDEuMzQtMyAzLTMgMyAxLjM0IDMgMy0zIDN6Ii8+Cjwvc3ZnPgo8L3N2Zz4K">
+    
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Modern Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-left">
+                <div class="logo">Findr</div>
+            </div>
+            <div class="nav-menu">
+                <a href="#about" class="nav-link">About</a>
+                <a href="#agents" class="nav-link">Find Agents</a>
+                <a href="#loans" class="nav-link">Home Loans</a>
+                <a href="#news" class="nav-link">News</a>
+                <a href="#commercial" class="nav-link">Commercial</a>
+            </div>
+            <div class="nav-right">
+                <button class="nav-signin" onclick="location.href='login.html'">Sign In</button>
+                <button class="nav-join" onclick="location.href='signup.html'">Join</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <h1 class="hero-title">Properties to call home</h1>
+        
+        <!-- Floating Search Module -->
+        <div class="search-module">
+            <div class="search-tabs">
+                <button class="search-tab active" data-tab="buy">Buy</button>
+                <button class="search-tab" data-tab="rent">Rent</button>
+                <button class="search-tab" data-tab="sold">Sold</button>
+                <button class="search-tab" data-tab="address">Address</button>
+                <button class="search-tab" data-tab="agents">Agents</button>
+                <button class="search-tab ai-tab" data-tab="ai">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 2L2 7L12 12L22 7L12 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 17L12 22L22 17" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M2 12L12 17L22 12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    AI Search
+                </button>
+            </div>
+            
+            <!-- Standard Search Bar -->
+            <div class="search-bar" id="standard-search">
+                <input type="text" class="search-input" placeholder="Search suburb, postcode or state">
+                <button class="search-filters-btn" id="filter-toggle" type="button">Filters</button>
+                <button class="search-submit-btn" onclick="location.href='search-results.html'">Search</button>
+            </div>
+            
+            <!-- Filter Panel -->
+            <div class="filter-panel" id="filter-panel" style="display: none;">
+                <div class="filter-header">
+                    <h3>Search Filters</h3>
+                    <button class="filter-close-btn" id="filter-close">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="filter-sections">
+                    <!-- Property Type Section -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Property Type:</h4>
+                        <div class="filter-options" id="property-type-options">
+                            <!-- Buy Property Types -->
+                            <div class="property-types-buy" id="buy-property-types">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="all-types">
+                                    <span class="checkmark"></span>
+                                    All Types
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="house">
+                                    <span class="checkmark"></span>
+                                    House
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="townhouse">
+                                    <span class="checkmark"></span>
+                                    Townhouse
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="apartment-unit">
+                                    <span class="checkmark"></span>
+                                    Apartment & Unit
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="villa">
+                                    <span class="checkmark"></span>
+                                    Villa
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="retirement-living">
+                                    <span class="checkmark"></span>
+                                    Retirement Living
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="land">
+                                    <span class="checkmark"></span>
+                                    Land
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="acreage">
+                                    <span class="checkmark"></span>
+                                    Acreage
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="rural">
+                                    <span class="checkmark"></span>
+                                    Rural
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="block-of-units">
+                                    <span class="checkmark"></span>
+                                    Block of Units
+                                </label>
+                            </div>
+                            
+                            <!-- Rent Property Types -->
+                            <div class="property-types-rent" id="rent-property-types" style="display: none;">
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="all-types">
+                                    <span class="checkmark"></span>
+                                    All Types
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="house">
+                                    <span class="checkmark"></span>
+                                    House
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="townhouse">
+                                    <span class="checkmark"></span>
+                                    Townhouse
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="apartment-unit">
+                                    <span class="checkmark"></span>
+                                    Apartment & Unit
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="villa">
+                                    <span class="checkmark"></span>
+                                    Villa
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="retirement-living">
+                                    <span class="checkmark"></span>
+                                    Retirement Living
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="land">
+                                    <span class="checkmark"></span>
+                                    Land
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="acreage">
+                                    <span class="checkmark"></span>
+                                    Acreage
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="rural">
+                                    <span class="checkmark"></span>
+                                    Rural
+                                </label>
+                                <label class="filter-option">
+                                    <input type="checkbox" name="property-type" value="block-of-units">
+                                    <span class="checkmark"></span>
+                                    Block of Units
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Bedrooms Section -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Bedrooms</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="radio" name="bedrooms" value="1">
+                                <span class="checkmark radio"></span>
+                                1
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="bedrooms" value="2">
+                                <span class="checkmark radio"></span>
+                                2
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="bedrooms" value="3">
+                                <span class="checkmark radio"></span>
+                                3
+                            </label>
+                            <label class="filter-option">
+                                <input type="radio" name="bedrooms" value="4">
+                                <span class="checkmark radio"></span>
+                                4+
+                            </label>
+                        </div>
+                    </div>
+                    
+                    <!-- Price Range Section -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Price Range</h4>
+                        <div class="price-inputs">
+                            <div class="price-input-group">
+                                <label>Min Price</label>
+                                <input type="number" class="price-input" placeholder="$0" min="0">
+                            </div>
+                            <div class="price-input-group">
+                                <label>Max Price</label>
+                                <input type="number" class="price-input" placeholder="$2,000,000" min="0">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Features Section -->
+                    <div class="filter-section">
+                        <h4 class="filter-section-title">Features</h4>
+                        <div class="filter-options">
+                            <label class="filter-option">
+                                <input type="checkbox" name="features" value="parking">
+                                <span class="checkmark"></span>
+                                Parking
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="features" value="pool">
+                                <span class="checkmark"></span>
+                                Pool
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="features" value="garden">
+                                <span class="checkmark"></span>
+                                Garden
+                            </label>
+                            <label class="filter-option">
+                                <input type="checkbox" name="features" value="balcony">
+                                <span class="checkmark"></span>
+                                Balcony
+                            </label>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="filter-actions">
+                    <button class="filter-clear-btn" id="filter-clear">Clear All</button>
+                    <button class="filter-apply-btn" id="filter-apply">Apply Filters</button>
+                </div>
+            </div>
+            
+            <!-- AI Search Bar -->
+            <div class="search-bar ai-search-bar" id="ai-search" style="display: none;">
+                <input type="text" class="search-input ai-input" placeholder="Try: 'Show me 3 bedroom houses in Sydney with a pool under $800k'">
+                <button class="search-submit-btn ai-search-btn">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                    AI Search
+                </button>
+            </div>
+            
+            <!-- AI Search Suggestions -->
+            <div class="ai-suggestions" id="ai-suggestions" style="display: none;">
+                <p class="suggestions-title">Popular searches:</p>
+                <div class="suggestion-chips">
+                    <button class="suggestion-chip">3 bedroom houses in Melbourne</button>
+                    <button class="suggestion-chip">Apartments with parking in Brisbane</button>
+                    <button class="suggestion-chip">Family homes under $600k</button>
+                    <button class="suggestion-chip">Properties near schools</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Google Map for property results -->
+        <div id="map" style="width: 100%; height: 400px; border-radius: 1rem; margin: 2.5rem 0 0 0; display: none;"></div>
+    </section>
+
+    <!-- Sign-in Promotion -->
+    <section class="signin-promo-section">
+        <div class="signin-promo-card">
+            <h3>Sign in for personalized recommendations</h3>
+            <p>Get tailored property suggestions, save your favorites, and receive updates based on your preferences.</p>
+            <button class="signin-promo-btn">Sign In or Create Account</button>
+        </div>
+    </section>
+
+    <!-- Personalized Recommendations -->
+    <section class="recommend-section">
+        <div class="container">
+            <h2 class="recommend-title">Recommended for You</h2>
+            <div class="recommend-cards">
+                <div class="property-card">
+                    <button class="property-save-btn" title="Save property">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    </button>
+                    <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1523217582562-09d0def993a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="property-card-body">
+                        <div class="property-tags">
+                            <span class="property-tag suggested"><span class="tag-icon">⭐</span>Suggested for You</span>
+                        </div>
+                        <h3 class="property-address">12 Oakwood Ave, Rowville VIC</h3>
+                        <div class="property-price">$1,150,000</div>
+                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <button class="property-save-btn" title="Save property">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    </button>
+                    <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="property-card-body">
+                        <div class="property-tags">
+                            <span class="property-tag new"><span class="tag-icon">⚡</span>New Listing</span>
+                        </div>
+                        <h3 class="property-address">8 Beachside Dr, Brighton VIC</h3>
+                        <div class="property-price">$2,350,000</div>
+                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <button class="property-save-btn" title="Save property">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    </button>
+                    <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1507089947368-19c1da9775ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="property-card-body">
+                        <div class="property-tags">
+                            <span class="property-tag suggested"><span class="tag-icon">⭐</span>Suggested for You</span>
+                        </div>
+                        <h3 class="property-address">22 Urban Lane, South Yarra VIC</h3>
+                        <div class="property-price">$1,780,000</div>
+                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <button class="property-save-btn" title="Save property">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    </button>
+                    <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="property-card-body">
+                        <div class="property-tags">
+                        </div>
+                        <h3 class="property-address">5 Maple St, Glen Waverley VIC</h3>
+                        <div class="property-price">$950,000</div>
+                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Affordability Insights -->
+    <!-- (Removed as requested) -->
+
+    <footer class="site-footer">
+        <div class="footer-inner">
+            <div class="footer-column">
+                <h4>Contact Us</h4>
+                <p><a href="mailto:info@findr.com">info@findr.com</a></p>
+                <p><a href="tel:+61123456789">+61 123 456 789</a></p>
+            </div>
+            <div class="footer-column">
+                <h4>Quick Links</h4>
+                <ul>
+                    <li><a href="#search">Search</a></li>
+                    <li><a href="#listings">Listings</a></li>
+                    <li><a href="#about">About</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2023 Findr. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+    
+    <!-- PWA Service Worker Registration -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then(registration => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch(registrationError => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+    </script>
+
+    <!-- Add modal markup at end of body if not present -->
+    <div id="filter-modal" class="filter-modal" style="display:none;">
+      <div class="filter-modal-content">
+        <button id="filter-modal-close" class="filter-modal-close">&times;</button>
+        <h3>Filters (Coming Soon)</h3>
+        <p>This is a placeholder for filter options.</p>
+      </div>
+    </div>
+</body>
+</html> 
