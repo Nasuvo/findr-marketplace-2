@@ -23,32 +23,55 @@
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <!-- Modern Navigation Bar -->
-    <nav class="navbar">
-        <div class="nav-container">
-            <div class="nav-left">
-                <div class="logo">Findr</div>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-container">
+            <!-- Logo -->
+            <div class="logo">
+                <a href="#" class="logo-link">
+                    <span class="logo-text">Findr</span>
+                </a>
             </div>
-            <div class="nav-menu">
-                <a href="#about" class="nav-link">About</a>
-                <a href="#agents" class="nav-link">Find Agents</a>
-                <a href="#loans" class="nav-link">Home Loans</a>
-                <a href="#news" class="nav-link">News</a>
-                <a href="#commercial" class="nav-link">Commercial</a>
-            </div>
-            <div class="nav-right">
-                <button class="nav-signin" onclick="location.href='login.html'">Sign In</button>
-                <button class="nav-join" onclick="location.href='signup.html'">Join</button>
+            
+            <!-- Navigation -->
+            <nav class="nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">About</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Find Agents</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Home Loans</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">News</a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" class="nav-link">Commercial</a>
+                    </li>
+                </ul>
+            </nav>
+            
+            <!-- Auth Buttons -->
+            <div class="auth-buttons">
+                <button class="auth-btn signin-btn" onclick="handleSignIn()">Sign In</button>
+                <button class="auth-btn join-btn" onclick="handleJoin()">Join</button>
             </div>
         </div>
-    </nav>
+    </header>
 
     <!-- Hero Section -->
-    <section class="hero">
-        <h1 class="hero-title">Properties to call home</h1>
+    <section class="hero hero-enhanced">
+        <div class="hero-content">
+            <h1 class="hero-title">Find Your Dream Home</h1>
+            <p class="hero-subtitle">Discover the perfect property in Australia's most sought-after locations</p>
+        </div>
         
         <!-- Floating Search Module -->
         <div class="search-module">
+            <!-- Search Tabs -->
             <div class="search-tabs">
                 <button class="search-tab active" data-tab="buy">Buy</button>
                 <button class="search-tab" data-tab="rent">Rent</button>
@@ -65,11 +88,11 @@
                 </button>
             </div>
             
-            <!-- Standard Search Bar -->
-            <div class="search-bar" id="standard-search">
+            <!-- Search Bar -->
+            <div class="search-bar">
                 <input type="text" class="search-input" placeholder="Search suburb, postcode or state">
                 <button class="search-filters-btn" id="filter-toggle" type="button">Filters</button>
-                <button class="search-submit-btn" onclick="location.href='search-results.html'">Search</button>
+                <button class="search-submit-btn" onclick="handleSearch()">Search</button>
             </div>
             
             <!-- Filter Panel -->
@@ -273,41 +296,79 @@
                     <button class="filter-apply-btn" id="filter-apply">Apply Filters</button>
                 </div>
             </div>
-            
-            <!-- AI Search Bar -->
-            <div class="search-bar ai-search-bar" id="ai-search" style="display: none;">
-                <input type="text" class="search-input ai-input" placeholder="Try: 'Show me 3 bedroom houses in Sydney with a pool under $800k'">
-                <button class="search-submit-btn ai-search-btn">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21 21L15 15M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                    AI Search
-                </button>
-            </div>
-            
-            <!-- AI Search Suggestions -->
-            <div class="ai-suggestions" id="ai-suggestions" style="display: none;">
-                <p class="suggestions-title">Popular searches:</p>
-                <div class="suggestion-chips">
-                    <button class="suggestion-chip">3 bedroom houses in Melbourne</button>
-                    <button class="suggestion-chip">Apartments with parking in Brisbane</button>
-                    <button class="suggestion-chip">Family homes under $600k</button>
-                    <button class="suggestion-chip">Properties near schools</button>
-                </div>
-            </div>
         </div>
 
         <!-- Google Map for property results -->
         <div id="map" style="width: 100%; height: 400px; border-radius: 1rem; margin: 2.5rem 0 0 0; display: none;"></div>
     </section>
 
-    <!-- Sign-in Promotion -->
-    <section class="signin-promo-section">
-        <div class="signin-promo-card">
-            <h3>Sign in for personalized recommendations</h3>
-            <p>Get tailored property suggestions, save your favorites, and receive updates based on your preferences.</p>
-            <button class="signin-promo-btn">Sign In or Create Account</button>
-        </div>
+    <!-- Sign-in Promotion and Mortgage Calculator -->
+    <section class="promo-calculator-container">
+        <!-- AI Mortgage Chatbot Card -->
+        <section class="ai-mortgage-chatbot-section">
+            <div class="ai-mortgage-chatbot-card ai-chatbot-enhanced">
+                <h3>Chat to your AI Mortgage Broker</h3>
+                <p>Get personalised guidance on deposits, borrowing power and repayments in seconds</p>
+                <button class="ai-chatbot-btn btn-enhanced" onclick="openChatModal()">Chat Now</button>
+            </div>
+        </section>
+
+        <!-- Mortgage Calculator -->
+        <section class="mortgage-calculator-section">
+            <div class="mortgage-calculator-card mortgage-calculator-enhanced">
+                <h3>Mortgage Calculator</h3>
+                <p>Calculate your estimated monthly repayments</p>
+                
+                <form class="mortgage-form" id="mortgage-form">
+                    <div class="input-group">
+                        <label for="property-price">Property Price</label>
+                        <div class="input-wrapper">
+                            <span class="currency-symbol">$</span>
+                            <input type="number" id="property-price" class="input-enhanced" placeholder="800,000" min="0" step="1000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="input-group">
+                        <label for="deposit-amount">Deposit Amount</label>
+                        <div class="input-wrapper">
+                            <span class="currency-symbol">$</span>
+                            <input type="number" id="deposit-amount" class="input-enhanced" placeholder="160,000" min="0" step="1000" required>
+                        </div>
+                    </div>
+                    
+                    <div class="input-row">
+                        <div class="input-group">
+                            <label for="loan-term">Loan Term (Years)</label>
+                            <input type="number" id="loan-term" class="input-enhanced" placeholder="30" min="1" max="50" required>
+                        </div>
+                        
+                        <div class="input-group">
+                            <label for="interest-rate">Interest Rate (%)</label>
+                            <input type="number" id="interest-rate" class="input-enhanced" placeholder="5.5" min="0" max="20" step="0.1" required>
+                        </div>
+                    </div>
+                    
+                    <button type="submit" class="calculate-btn btn-enhanced">Calculate Repayment</button>
+                </form>
+                
+                <div class="result-section" id="result-section" style="display: none;">
+                    <div class="result-card">
+                        <h4>Estimated monthly repayment</h4>
+                        <div class="monthly-payment" id="monthly-payment">$0</div>
+                        <div class="loan-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Loan Amount:</span>
+                                <span class="detail-value" id="loan-amount">$0</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Total Interest:</span>
+                                <span class="detail-value" id="total-interest">$0</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
     </section>
 
     <!-- Personalized Recommendations -->
@@ -316,58 +377,99 @@
             <h2 class="recommend-title">Recommended for You</h2>
             <div class="recommend-cards">
                 <div class="property-card">
-                    <button class="property-save-btn" title="Save property">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    <button class="property-save-btn" title="Save property" onclick="toggleSaveProperty(this, '12 Oakwood Ave, Rowville VIC')">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
                     </button>
                     <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1523217582562-09d0def993a6?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
                     <div class="property-card-body">
                         <div class="property-tags">
-                            <span class="property-tag suggested"><span class="tag-icon">⭐</span>Suggested for You</span>
+                            <span class="property-tag suggested property-tag-enhanced">Recommended</span>
                         </div>
                         <h3 class="property-address">12 Oakwood Ave, Rowville VIC</h3>
                         <div class="property-price">$1,150,000</div>
-                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                        <button class="property-details-btn btn-enhanced" onclick="showPropertyDetails('12 Oakwood Ave, Rowville VIC')">View Details</button>
                     </div>
                 </div>
                 <div class="property-card">
-                    <button class="property-save-btn" title="Save property">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    <button class="property-save-btn" title="Save property" onclick="toggleSaveProperty(this, '8 Beachside Dr, Brighton VIC')">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
                     </button>
                     <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1505691938895-1758d7feb511?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
                     <div class="property-card-body">
                         <div class="property-tags">
-                            <span class="property-tag new"><span class="tag-icon">⚡</span>New Listing</span>
+                            <span class="property-tag new property-tag-enhanced">Just Listed</span>
                         </div>
                         <h3 class="property-address">8 Beachside Dr, Brighton VIC</h3>
                         <div class="property-price">$2,350,000</div>
-                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                        <button class="property-details-btn btn-enhanced" onclick="showPropertyDetails('8 Beachside Dr, Brighton VIC')">View Details</button>
                     </div>
                 </div>
                 <div class="property-card">
-                    <button class="property-save-btn" title="Save property">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    <button class="property-save-btn" title="Save property" onclick="toggleSaveProperty(this, '22 Urban Lane, South Yarra VIC')">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
                     </button>
                     <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1507089947368-19c1da9775ae?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
                     <div class="property-card-body">
                         <div class="property-tags">
-                            <span class="property-tag suggested"><span class="tag-icon">⭐</span>Suggested for You</span>
+                            <span class="property-tag suggested property-tag-enhanced">Recommended</span>
                         </div>
                         <h3 class="property-address">22 Urban Lane, South Yarra VIC</h3>
                         <div class="property-price">$1,780,000</div>
-                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                        <button class="property-details-btn btn-enhanced" onclick="showPropertyDetails('22 Urban Lane, South Yarra VIC')">View Details</button>
                     </div>
                 </div>
                 <div class="property-card">
-                    <button class="property-save-btn" title="Save property">
-                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 21s-6.5-5.05-9-8.5C-1.5 7.5 4.5 3 12 9.5 19.5 3 25.5 7.5 21 12.5c-2.5 3.45-9 8.5-9 8.5z"/></svg>
+                    <button class="property-save-btn" title="Save property" onclick="toggleSaveProperty(this, '5 Maple St, Glen Waverley VIC')">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
                     </button>
                     <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1521737852567-6949f3f9f2b5?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
                     <div class="property-card-body">
                         <div class="property-tags">
+                            <span class="property-tag featured property-tag-enhanced">Featured</span>
                         </div>
                         <h3 class="property-address">5 Maple St, Glen Waverley VIC</h3>
                         <div class="property-price">$950,000</div>
-                        <button class="property-details-btn" onclick="location.href='property.html'">View Details</button>
+                        <button class="property-details-btn btn-enhanced" onclick="showPropertyDetails('5 Maple St, Glen Waverley VIC')">View Details</button>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <button class="property-save-btn" title="Save property" onclick="toggleSaveProperty(this, '45 Collins St, Melbourne VIC')">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </button>
+                    <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="property-card-body">
+                        <div class="property-tags">
+                            <span class="property-tag commercial property-tag-enhanced">Commercial</span>
+                        </div>
+                        <h3 class="property-address">45 Collins St, Melbourne VIC</h3>
+                        <div class="property-price">$4,200,000</div>
+                        <button class="property-details-btn btn-enhanced" onclick="showPropertyDetails('45 Collins St, Melbourne VIC')">View Details</button>
+                    </div>
+                </div>
+                <div class="property-card">
+                    <button class="property-save-btn" title="Save property" onclick="toggleSaveProperty(this, '12 Harbour View, Sydney NSW')">
+                        <svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                        </svg>
+                    </button>
+                    <div class="property-img" style="background-image: url('https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80');"></div>
+                    <div class="property-card-body">
+                        <div class="property-tags">
+                            <span class="property-tag commercial property-tag-enhanced">Commercial</span>
+                        </div>
+                        <h3 class="property-address">12 Harbour View, Sydney NSW</h3>
+                        <div class="property-price">$6,800,000</div>
+                        <button class="property-details-btn btn-enhanced" onclick="showPropertyDetails('12 Harbour View, Sydney NSW')">View Details</button>
                     </div>
                 </div>
             </div>
@@ -377,24 +479,40 @@
     <!-- Affordability Insights -->
     <!-- (Removed as requested) -->
 
-    <footer class="site-footer">
+    <footer class="site-footer footer-enhanced">
         <div class="footer-inner">
             <div class="footer-column">
                 <h4>Contact Us</h4>
                 <p><a href="mailto:info@findr.com">info@findr.com</a></p>
                 <p><a href="tel:+61123456789">+61 123 456 789</a></p>
+                <p>123 Property Street<br>Melbourne VIC 3000</p>
             </div>
+            
             <div class="footer-column">
                 <h4>Quick Links</h4>
                 <ul>
-                    <li><a href="#search">Search</a></li>
-                    <li><a href="#listings">Listings</a></li>
-                    <li><a href="#about">About</a></li>
+                    <li><a href="#search">Search Properties</a></li>
+                    <li><a href="#listings">View Listings</a></li>
+                    <li><a href="#about">About Us</a></li>
+                    <li><a href="#agents">Find Agents</a></li>
+                    <li><a href="#loans">Home Loans</a></li>
                 </ul>
             </div>
+            
+            <div class="footer-column">
+                <h4>Stay Updated</h4>
+                <p>Get the latest property insights and market updates delivered to your inbox.</p>
+                <div class="newsletter-section">
+                    <div class="newsletter-input">
+                        <input type="email" placeholder="Enter your email address" required>
+                        <button onclick="subscribeNewsletter()">Subscribe</button>
+                    </div>
+                </div>
+            </div>
         </div>
+        
         <div class="footer-bottom">
-            <p>&copy; 2023 Findr. All rights reserved.</p>
+            <p>&copy; 2024 Findr. All rights reserved. | <a href="#privacy">Privacy Policy</a> | <a href="#terms">Terms of Service</a></p>
         </div>
     </footer>
 
@@ -416,12 +534,77 @@
     </script>
 
     <!-- Add modal markup at end of body if not present -->
-    <div id="filter-modal" class="filter-modal" style="display:none;">
-      <div class="filter-modal-content">
+    <div id="filter-modal" class="filter-modal modal-enhanced" style="display:none;">
+      <div class="filter-modal-content modal-content-enhanced">
         <button id="filter-modal-close" class="filter-modal-close">&times;</button>
         <h3>Filters (Coming Soon)</h3>
         <p>This is a placeholder for filter options.</p>
       </div>
     </div>
+
+    <!-- Chat Modal -->
+    <div id="chat-modal" class="chat-modal modal-enhanced" style="display:none;">
+      <div class="chat-modal-content modal-content-enhanced">
+        <div class="chat-header">
+          <h3>AI Mortgage Broker</h3>
+          <button id="chat-modal-close" class="chat-modal-close">&times;</button>
+        </div>
+        <div class="chat-messages">
+          <div class="message bot">
+            <div class="message-content">
+              Hi! I'm your AI mortgage broker. How can I help you today?
+            </div>
+          </div>
+          <div class="message user">
+            <div class="message-content">
+              What's the minimum deposit I need for a $800k property?
+            </div>
+          </div>
+          <div class="message bot">
+            <div class="message-content">
+              For a $800k property, you typically need at least 10% deposit ($80k) for most lenders, though some may require 20% ($160k) to avoid LMI. Would you like me to calculate your borrowing power?
+            </div>
+          </div>
+        </div>
+        <div class="chat-input">
+          <input type="text" placeholder="Type your question..." disabled>
+          <button disabled>Send</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sign In Modal -->
+    <div id="signin-modal" class="signin-modal modal-enhanced" style="display:none;">
+      <div class="signin-modal-content modal-content-enhanced">
+        <button id="signin-modal-close" class="signin-modal-close">&times;</button>
+        <h3>Sign In</h3>
+        <p>Welcome back to Findr</p>
+        <form class="signin-form">
+          <input type="email" class="input-enhanced" placeholder="Email address" required>
+          <input type="password" class="input-enhanced" placeholder="Password" required>
+          <button type="submit" class="btn-enhanced">Sign In</button>
+        </form>
+        <p class="signin-footer">Don't have an account? <a href="#" id="show-signup">Create one</a></p>
+      </div>
+    </div>
+
+    <!-- Join Modal -->
+    <div id="join-modal" class="join-modal modal-enhanced" style="display:none;">
+      <div class="join-modal-content modal-content-enhanced">
+        <button id="join-modal-close" class="join-modal-close">&times;</button>
+        <h3>Join Findr</h3>
+        <p>Create your account to save properties and get personalized recommendations</p>
+        <form class="join-form">
+          <input type="text" class="input-enhanced" placeholder="Full name" required>
+          <input type="email" class="input-enhanced" placeholder="Email address" required>
+          <input type="password" class="input-enhanced" placeholder="Create password" required>
+          <button type="submit" class="btn-enhanced">Create Account</button>
+        </form>
+        <p class="join-footer">Already have an account? <a href="#" id="show-signin">Sign in</a></p>
+      </div>
+    </div>
+
+    <!-- Toast Notifications -->
+    <div id="toast-container" class="toast-container"></div>
 </body>
 </html> 

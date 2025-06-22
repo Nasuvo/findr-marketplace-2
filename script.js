@@ -1609,33 +1609,89 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Search Tabs Functionality ---
     const searchTabs = document.querySelectorAll('.search-tab');
     const standardSearch = document.getElementById('standard-search');
-    const aiSearchBar = document.getElementById('ai-search');
-    const buyTypes = document.getElementById('buy-property-types');
-    const rentTypes = document.getElementById('rent-property-types');
+    const aiSearch = document.getElementById('ai-search');
+    const aiSuggestions = document.getElementById('ai-suggestions');
+    const buyPropertyTypes = document.getElementById('buy-property-types');
+    const rentPropertyTypes = document.getElementById('rent-property-types');
 
     searchTabs.forEach(tab => {
-      tab.addEventListener('click', function() {
-        // Remove active from all
-        searchTabs.forEach(t => t.classList.remove('active'));
-        this.classList.add('active');
-        const tabType = this.getAttribute('data-tab');
-        if (tabType === 'buy') {
-          if (standardSearch) standardSearch.style.display = '';
-          if (aiSearchBar) aiSearchBar.style.display = 'none';
-          if (buyTypes) buyTypes.style.display = '';
-          if (rentTypes) rentTypes.style.display = 'none';
-        } else if (tabType === 'rent') {
-          if (standardSearch) standardSearch.style.display = '';
-          if (aiSearchBar) aiSearchBar.style.display = 'none';
-          if (buyTypes) buyTypes.style.display = 'none';
-          if (rentTypes) rentTypes.style.display = '';
-        } else if (tabType === 'ai') {
-          if (standardSearch) standardSearch.style.display = 'none';
-          if (aiSearchBar) aiSearchBar.style.display = '';
-        } else {
-          alert('Coming soon!');
-        }
-      });
+        tab.addEventListener('click', function() {
+            // Remove active class from all tabs
+            searchTabs.forEach(t => t.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            
+            const tabType = this.getAttribute('data-tab');
+            
+            // Handle property type display for buy/rent tabs
+            if (tabType === 'buy') {
+                if (buyPropertyTypes) buyPropertyTypes.style.display = 'grid';
+                if (rentPropertyTypes) rentPropertyTypes.style.display = 'none';
+            } else if (tabType === 'rent') {
+                if (buyPropertyTypes) buyPropertyTypes.style.display = 'none';
+                if (rentPropertyTypes) rentPropertyTypes.style.display = 'grid';
+            }
+            
+            // Show appropriate message for other tabs
+            if (tabType === 'sold' || tabType === 'address' || tabType === 'agents') {
+                showToast(`${tabType.charAt(0).toUpperCase() + tabType.slice(1)} search coming soon!`, 'info');
+            } else if (tabType === 'ai') {
+                showToast('AI Search feature coming soon!', 'info');
+            }
+        });
+    });
+
+    // Filter panel functionality
+    const filterToggle = document.getElementById('filter-toggle');
+    const filterPanel = document.getElementById('filter-panel');
+    const filterClose = document.getElementById('filter-close');
+    const filterClear = document.getElementById('filter-clear');
+    const filterApply = document.getElementById('filter-apply');
+
+    if (filterToggle) {
+        filterToggle.addEventListener('click', function() {
+            filterPanel.style.display = filterPanel.style.display === 'none' ? 'block' : 'none';
+        });
+    }
+
+    if (filterClose) {
+        filterClose.addEventListener('click', function() {
+            filterPanel.style.display = 'none';
+        });
+    }
+
+    if (filterClear) {
+        filterClear.addEventListener('click', function() {
+            // Clear all checkboxes and radio buttons
+            const checkboxes = filterPanel.querySelectorAll('input[type="checkbox"]');
+            const radioButtons = filterPanel.querySelectorAll('input[type="radio"]');
+            const priceInputs = filterPanel.querySelectorAll('.price-input');
+            
+            checkboxes.forEach(cb => cb.checked = false);
+            radioButtons.forEach(rb => rb.checked = false);
+            priceInputs.forEach(input => input.value = '');
+        });
+    }
+
+    if (filterApply) {
+        filterApply.addEventListener('click', function() {
+            filterPanel.style.display = 'none';
+            showToast('Filters applied successfully!', 'success');
+        });
+    }
+
+    // AI suggestion chips
+    const suggestionChips = document.querySelectorAll('.suggestion-chip');
+    const aiInput = document.querySelector('.ai-input');
+    
+    suggestionChips.forEach(chip => {
+        chip.addEventListener('click', function() {
+            if (aiInput) {
+                aiInput.value = this.textContent;
+                aiInput.focus();
+            }
+        });
     });
 });
 
@@ -1659,7 +1715,7 @@ function performSearch(searchType, filters) {
             }
         }
     });
-});
+}
 
 // AI Search function
 function performAISearch(query) {
@@ -2112,3 +2168,1028 @@ comingSoonBtns.forEach(btn => {
     alert('Coming soon!');
   });
 });
+
+// Mortgage Calculator Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const mortgageForm = document.getElementById('mortgage-form');
+    const resultSection = document.getElementById('result-section');
+    
+    if (mortgageForm) {
+        mortgageForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            calculateMortgage();
+        });
+        
+        // Add real-time calculation on input change
+        const inputs = mortgageForm.querySelectorAll('input');
+        inputs.forEach(input => {
+            input.addEventListener('input', function() {
+                if (allInputsFilled()) {
+                    calculateMortgage();
+                }
+            });
+        });
+    }
+});
+
+function calculateMortgage() {
+    const propertyPrice = parseFloat(document.getElementById('property-price').value) || 0;
+    const depositAmount = parseFloat(document.getElementById('deposit-amount').value) || 0;
+    const loanTerm = parseFloat(document.getElementById('loan-term').value) || 0;
+    const interestRate = parseFloat(document.getElementById('interest-rate').value) || 0;
+    
+    // Validate inputs
+    if (propertyPrice <= 0 || depositAmount < 0 || loanTerm <= 0 || interestRate < 0) {
+        return;
+    }
+    
+    // Calculate loan amount
+    const loanAmount = propertyPrice - depositAmount;
+    
+    if (loanAmount <= 0) {
+        showMortgageError('Deposit amount cannot exceed property price');
+        return;
+    }
+    
+    // Convert annual interest rate to monthly
+    const monthlyInterestRate = (interestRate / 100) / 12;
+    
+    // Convert years to months
+    const totalPayments = loanTerm * 12;
+    
+    // Calculate monthly payment using Australian mortgage formula
+    let monthlyPayment;
+    if (monthlyInterestRate === 0) {
+        monthlyPayment = loanAmount / totalPayments;
+    } else {
+        monthlyPayment = loanAmount * (monthlyInterestRate * Math.pow(1 + monthlyInterestRate, totalPayments)) / 
+                        (Math.pow(1 + monthlyInterestRate, totalPayments) - 1);
+    }
+    
+    // Calculate total interest
+    const totalInterest = (monthlyPayment * totalPayments) - loanAmount;
+    
+    // Display results
+    displayMortgageResults(monthlyPayment, loanAmount, totalInterest);
+}
+
+function allInputsFilled() {
+    const propertyPrice = document.getElementById('property-price').value;
+    const depositAmount = document.getElementById('deposit-amount').value;
+    const loanTerm = document.getElementById('loan-term').value;
+    const interestRate = document.getElementById('interest-rate').value;
+    
+    return propertyPrice && depositAmount && loanTerm && interestRate;
+}
+
+function displayMortgageResults(monthlyPayment, loanAmount, totalInterest) {
+    const resultSection = document.getElementById('result-section');
+    const monthlyPaymentElement = document.getElementById('monthly-payment');
+    const loanAmountElement = document.getElementById('loan-amount');
+    const totalInterestElement = document.getElementById('total-interest');
+    
+    // Format currency values
+    const formatCurrency = (value) => {
+        return new Intl.NumberFormat('en-AU', {
+            style: 'currency',
+            currency: 'AUD',
+            minimumFractionDigits: 0,
+            maximumFractionDigits: 0
+        }).format(value);
+    };
+    
+    // Update display
+    monthlyPaymentElement.textContent = formatCurrency(monthlyPayment);
+    loanAmountElement.textContent = formatCurrency(loanAmount);
+    totalInterestElement.textContent = formatCurrency(totalInterest);
+    
+    // Show result section with animation
+    resultSection.style.display = 'block';
+    resultSection.style.opacity = '0';
+    resultSection.style.transform = 'translateY(10px)';
+    
+    setTimeout(() => {
+        resultSection.style.transition = 'all 0.3s ease';
+        resultSection.style.opacity = '1';
+        resultSection.style.transform = 'translateY(0)';
+    }, 10);
+}
+
+function showMortgageError(message) {
+    // Create error message element
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'mortgage-error';
+    errorDiv.textContent = message;
+    errorDiv.style.cssText = `
+        background: #fee;
+        color: #c53030;
+        padding: 0.75rem;
+        border-radius: 0.5rem;
+        margin-top: 1rem;
+        border: 1px solid #feb2b2;
+        font-size: 0.9rem;
+        text-align: center;
+    `;
+    
+    // Remove any existing error messages
+    const existingError = document.querySelector('.mortgage-error');
+    if (existingError) {
+        existingError.remove();
+    }
+    
+    // Add error message to form
+    const mortgageForm = document.getElementById('mortgage-form');
+    mortgageForm.appendChild(errorDiv);
+    
+    // Remove error message after 5 seconds
+    setTimeout(() => {
+        if (errorDiv.parentNode) {
+            errorDiv.remove();
+        }
+    }, 5000);
+}
+
+// Interactive Functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all interactive features
+    initModals();
+    initFilters();
+    initSearch();
+    initPropertyInteractions();
+});
+
+// Modal Management
+function initModals() {
+    // Chat Modal
+    const chatModal = document.getElementById('chat-modal');
+    const chatBtn = document.querySelector('.ai-chatbot-btn');
+    const chatClose = document.getElementById('chat-modal-close');
+    
+    if (chatBtn) chatBtn.addEventListener('click', openChatModal);
+    if (chatClose) chatClose.addEventListener('click', closeChatModal);
+    
+    // Sign In Modal
+    const signinModal = document.getElementById('signin-modal');
+    const signinBtn = document.querySelector('.nav-signin');
+    const signinClose = document.getElementById('signin-modal-close');
+    const showSignup = document.getElementById('show-signup');
+    
+    if (signinBtn) signinBtn.addEventListener('click', openSignInModal);
+    if (signinClose) signinClose.addEventListener('click', closeSignInModal);
+    if (showSignup) showSignup.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeSignInModal();
+        openJoinModal();
+    });
+    
+    // Join Modal
+    const joinModal = document.getElementById('join-modal');
+    const joinBtn = document.querySelector('.nav-join');
+    const joinClose = document.getElementById('join-modal-close');
+    const showSignin = document.getElementById('show-signin');
+    
+    if (joinBtn) joinBtn.addEventListener('click', openJoinModal);
+    if (joinClose) joinClose.addEventListener('click', closeJoinModal);
+    if (showSignin) showSignin.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeJoinModal();
+        openSignInModal();
+    });
+    
+    // Close modals when clicking outside
+    [chatModal, signinModal, joinModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                    modal.style.display = 'none';
+                }
+            });
+        }
+    });
+    
+    // Handle form submissions
+    const signinForm = document.querySelector('.signin-form');
+    const joinForm = document.querySelector('.join-form');
+    
+    if (signinForm) {
+        signinForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            showToast('Sign in functionality coming soon!', 'success');
+            closeSignInModal();
+        });
+    }
+    
+    if (joinForm) {
+        joinForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            showToast('Account creation coming soon!', 'success');
+            closeJoinModal();
+        });
+    }
+}
+
+// Modal Functions
+function openChatModal() {
+    const modal = document.getElementById('chat-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+}
+
+function closeChatModal() {
+    const modal = document.getElementById('chat-modal');
+    modal.classList.remove('show');
+    setTimeout(() => modal.style.display = 'none', 300);
+}
+
+function openSignInModal() {
+    const modal = document.getElementById('signin-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+}
+
+function closeSignInModal() {
+    const modal = document.getElementById('signin-modal');
+    modal.classList.remove('show');
+    setTimeout(() => modal.style.display = 'none', 300);
+}
+
+function openJoinModal() {
+    const modal = document.getElementById('join-modal');
+    modal.style.display = 'flex';
+    setTimeout(() => modal.classList.add('show'), 10);
+}
+
+function closeJoinModal() {
+    const modal = document.getElementById('join-modal');
+    modal.classList.remove('show');
+    setTimeout(() => modal.style.display = 'none', 300);
+}
+
+// Filter Management
+function initFilters() {
+    const filterToggle = document.getElementById('filter-toggle');
+    const filterModal = document.getElementById('filter-modal');
+    const filterClose = document.getElementById('filter-modal-close');
+    
+    if (filterToggle) {
+        filterToggle.addEventListener('click', () => {
+            filterModal.style.display = 'flex';
+            setTimeout(() => filterModal.classList.add('open'), 10);
+        });
+    }
+    
+    if (filterClose) {
+        filterClose.addEventListener('click', () => {
+            filterModal.classList.remove('open');
+            setTimeout(() => filterModal.style.display = 'none', 300);
+        });
+    }
+}
+
+// Search Management
+function initSearch() {
+    const searchForm = document.querySelector('.search-bar');
+    if (searchForm) {
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleSearch();
+        });
+    }
+}
+
+function handleSearch() {
+    const searchInput = document.querySelector('.search-input');
+    const query = searchInput ? searchInput.value.trim() : '';
+    
+    if (!query) {
+        showToast('Please enter a location to search', 'error');
+        return;
+    }
+    
+    // Simulate search redirect
+    showToast(`Searching for properties in ${query}...`, 'success');
+    
+    // Create a simple search results page simulation
+    setTimeout(() => {
+        const searchResults = `
+            <div style="padding: 2rem; text-align: center; max-width: 800px; margin: 0 auto;">
+                <h1>Search Results for "${query}"</h1>
+                <p>Found 24 properties in ${query}</p>
+                <div style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; margin: 2rem 0;">
+                    <h3>Sample Properties</h3>
+                    <p>• 3-bedroom house - $850,000</p>
+                    <p>• 2-bedroom apartment - $650,000</p>
+                    <p>• 4-bedroom family home - $1,200,000</p>
+                </div>
+                <button onclick="window.history.back()" style="background: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Back to Home</button>
+            </div>
+        `;
+        
+        document.body.innerHTML = searchResults;
+    }, 1000);
+}
+
+// Property Interactions
+function initPropertyInteractions() {
+    // Heart button interactions are handled by onclick attributes
+}
+
+function toggleSaveProperty(button, propertyAddress) {
+    const svg = button.querySelector('svg');
+    const isSaved = button.classList.contains('saved');
+    
+    if (isSaved) {
+        button.classList.remove('saved');
+        svg.style.fill = 'none';
+        showToast(`Removed ${propertyAddress} from saved properties`, 'success');
+    } else {
+        button.classList.add('saved');
+        svg.style.fill = '#FF3B30';
+        showToast(`Saved ${propertyAddress} to your favorites!`, 'success');
+    }
+}
+
+function showPropertyDetails(propertyAddress) {
+    showToast(`Loading details for ${propertyAddress}...`, 'success');
+    
+    // Simulate property details page
+    setTimeout(() => {
+        const propertyDetails = `
+            <div style="padding: 2rem; text-align: center; max-width: 800px; margin: 0 auto;">
+                <h1>${propertyAddress}</h1>
+                <div style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; margin: 2rem 0;">
+                    <h3>Property Details</h3>
+                    <p>• 4 bedrooms, 3 bathrooms</p>
+                    <p>• 2 car spaces</p>
+                    <p>• Modern kitchen with stone benchtops</p>
+                    <p>• Large backyard with garden</p>
+                    <p>• Close to schools and transport</p>
+                </div>
+                <button onclick="window.history.back()" style="background: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Back to Search</button>
+            </div>
+        `;
+        
+        document.body.innerHTML = propertyDetails;
+    }, 1000);
+}
+
+// Toast Notifications
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.textContent = message;
+    
+    container.appendChild(toast);
+    
+    // Show toast
+    setTimeout(() => toast.classList.add('show'), 10);
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Newsletter Subscription
+function subscribeNewsletter() {
+    const emailInput = document.querySelector('.newsletter-input input');
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+        showToast('Please enter your email address', 'error');
+        return;
+    }
+    
+    if (!isValidEmail(email)) {
+        showToast('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    // Simulate subscription
+    showToast('Thank you for subscribing! You\'ll receive updates soon.', 'success');
+    emailInput.value = '';
+}
+
+// Email validation helper
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Performance optimizations and enhanced functionality
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all interactive features with performance optimizations
+    initModals();
+    initFilters();
+    initSearch();
+    initPropertyInteractions();
+    initLazyLoading();
+    initIntersectionObserver();
+    initPerformanceMonitoring();
+    initAccessibilityFeatures();
+});
+
+// Performance monitoring
+function initPerformanceMonitoring() {
+    // Monitor Core Web Vitals
+    if ('PerformanceObserver' in window) {
+        const observer = new PerformanceObserver((list) => {
+            for (const entry of list.getEntries()) {
+                if (entry.entryType === 'largest-contentful-paint') {
+                    console.log('LCP:', entry.startTime);
+                }
+                if (entry.entryType === 'first-input') {
+                    console.log('FID:', entry.processingStart - entry.startTime);
+                }
+            }
+        });
+        observer.observe({ entryTypes: ['largest-contentful-paint', 'first-input'] });
+    }
+}
+
+// Lazy loading for images
+function initLazyLoading() {
+    const images = document.querySelectorAll('.property-img');
+    const imageObserver = new IntersectionObserver((entries, observer) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const img = entry.target;
+                img.style.backgroundImage = img.getAttribute('data-src');
+                img.classList.remove('lazy');
+                observer.unobserve(img);
+            }
+        });
+    });
+
+    images.forEach(img => {
+        if (img.classList.contains('lazy')) {
+            imageObserver.observe(img);
+        }
+    });
+}
+
+// Intersection Observer for animations
+function initIntersectionObserver() {
+    const animatedElements = document.querySelectorAll('.property-card, .search-module, .hero-content');
+    
+    const animationObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.style.opacity = '1';
+                entry.target.style.transform = 'translateY(0)';
+            }
+        });
+    }, {
+        threshold: 0.1,
+        rootMargin: '0px 0px -50px 0px'
+    });
+
+    animatedElements.forEach(el => {
+        el.style.opacity = '0';
+        el.style.transform = 'translateY(30px)';
+        el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+        animationObserver.observe(el);
+    });
+}
+
+// Enhanced accessibility features
+function initAccessibilityFeatures() {
+    // Keyboard navigation for property cards
+    const propertyCards = document.querySelectorAll('.property-card');
+    propertyCards.forEach(card => {
+        card.setAttribute('tabindex', '0');
+        card.setAttribute('role', 'button');
+        card.setAttribute('aria-label', 'Property card - click to view details');
+        
+        card.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const detailsBtn = card.querySelector('.property-details-btn');
+                if (detailsBtn) {
+                    detailsBtn.click();
+                }
+            }
+        });
+    });
+
+    // Skip to main content link
+    const skipLink = document.createElement('a');
+    skipLink.href = '#main-content';
+    skipLink.textContent = 'Skip to main content';
+    skipLink.className = 'skip-link';
+    skipLink.style.cssText = `
+        position: absolute;
+        top: -40px;
+        left: 6px;
+        background: var(--primary-color);
+        color: white;
+        padding: 8px;
+        text-decoration: none;
+        border-radius: 4px;
+        z-index: 10000;
+    `;
+    skipLink.addEventListener('focus', () => {
+        skipLink.style.top = '6px';
+    });
+    skipLink.addEventListener('blur', () => {
+        skipLink.style.top = '-40px';
+    });
+    document.body.insertBefore(skipLink, document.body.firstChild);
+}
+
+// Enhanced Modal Management with performance optimizations
+function initModals() {
+    // Chat Modal
+    const chatModal = document.getElementById('chat-modal');
+    const chatBtn = document.querySelector('.ai-chatbot-btn');
+    const chatClose = document.getElementById('chat-modal-close');
+    
+    if (chatBtn) chatBtn.addEventListener('click', openChatModal);
+    if (chatClose) chatClose.addEventListener('click', closeChatModal);
+    
+    // Sign In Modal
+    const signinModal = document.getElementById('signin-modal');
+    const signinBtn = document.querySelector('.nav-signin');
+    const signinClose = document.getElementById('signin-modal-close');
+    const showSignup = document.getElementById('show-signup');
+    
+    if (signinBtn) signinBtn.addEventListener('click', openSignInModal);
+    if (signinClose) signinClose.addEventListener('click', closeSignInModal);
+    if (showSignup) showSignup.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeSignInModal();
+        openJoinModal();
+    });
+    
+    // Join Modal
+    const joinModal = document.getElementById('join-modal');
+    const joinBtn = document.querySelector('.nav-join');
+    const joinClose = document.getElementById('join-modal-close');
+    const showSignin = document.getElementById('show-signin');
+    
+    if (joinBtn) joinBtn.addEventListener('click', openJoinModal);
+    if (joinClose) joinClose.addEventListener('click', closeJoinModal);
+    if (showSignin) showSignin.addEventListener('click', (e) => {
+        e.preventDefault();
+        closeJoinModal();
+        openSignInModal();
+    });
+    
+    // Close modals when clicking outside with performance optimization
+    [chatModal, signinModal, joinModal].forEach(modal => {
+        if (modal) {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    closeModal(modal);
+                }
+            });
+        }
+    });
+    
+    // Handle form submissions with enhanced UX
+    const signinForm = document.querySelector('.signin-form');
+    const joinForm = document.querySelector('.join-form');
+    
+    if (signinForm) {
+        signinForm.addEventListener('submit', handleSignIn);
+    }
+    
+    if (joinForm) {
+        joinForm.addEventListener('submit', handleJoin);
+    }
+
+    // Escape key to close modals
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const openModal = document.querySelector('.modal-enhanced.show');
+            if (openModal) {
+                closeModal(openModal);
+            }
+        }
+    });
+}
+
+// Enhanced form handlers
+function handleSignIn(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    // Show loading state
+    submitBtn.textContent = 'Signing in...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        showToast('Sign in functionality coming soon!', 'success');
+        closeSignInModal();
+        
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }, 1500);
+}
+
+function handleJoin(e) {
+    e.preventDefault();
+    const form = e.target;
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    
+    // Show loading state
+    submitBtn.textContent = 'Creating account...';
+    submitBtn.disabled = true;
+    
+    // Simulate API call
+    setTimeout(() => {
+        showToast('Account creation coming soon!', 'success');
+        closeJoinModal();
+        
+        // Reset button
+        submitBtn.textContent = originalText;
+        submitBtn.disabled = false;
+    }, 1500);
+}
+
+// Enhanced Modal Functions with better animations
+function openChatModal() {
+    const modal = document.getElementById('chat-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden'; // Prevent background scroll
+    requestAnimationFrame(() => {
+        modal.classList.add('show');
+    });
+}
+
+function closeChatModal() {
+    const modal = document.getElementById('chat-modal');
+    closeModal(modal);
+}
+
+function openSignInModal() {
+    const modal = document.getElementById('signin-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+        modal.classList.add('show');
+    });
+}
+
+function closeSignInModal() {
+    const modal = document.getElementById('signin-modal');
+    closeModal(modal);
+}
+
+function openJoinModal() {
+    const modal = document.getElementById('join-modal');
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+    requestAnimationFrame(() => {
+        modal.classList.add('show');
+    });
+}
+
+function closeJoinModal() {
+    const modal = document.getElementById('join-modal');
+    closeModal(modal);
+}
+
+// Generic modal close function
+function closeModal(modal) {
+    modal.classList.remove('show');
+    document.body.style.overflow = ''; // Restore scroll
+    setTimeout(() => {
+        modal.style.display = 'none';
+    }, 300);
+}
+
+// Enhanced Filter Management
+function initFilters() {
+    const filterToggle = document.getElementById('filter-toggle');
+    const filterModal = document.getElementById('filter-modal');
+    const filterClose = document.getElementById('filter-modal-close');
+    
+    if (filterToggle) {
+        filterToggle.addEventListener('click', () => {
+            filterModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            requestAnimationFrame(() => {
+                filterModal.classList.add('open');
+            });
+        });
+    }
+    
+    if (filterClose) {
+        filterClose.addEventListener('click', () => {
+            closeFilterModal();
+        });
+    }
+}
+
+function closeFilterModal() {
+    const filterModal = document.getElementById('filter-modal');
+    filterModal.classList.remove('open');
+    document.body.style.overflow = '';
+    setTimeout(() => {
+        filterModal.style.display = 'none';
+    }, 300);
+}
+
+// Enhanced Search Management
+function initSearch() {
+    const searchForm = document.querySelector('.search-bar');
+    if (searchForm) {
+        searchForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            handleSearch();
+        });
+    }
+
+    // Add search suggestions functionality
+    const searchInput = document.querySelector('.search-input');
+    if (searchInput) {
+        searchInput.addEventListener('input', debounce(handleSearchSuggestions, 300));
+    }
+}
+
+// Debounce function for performance
+function debounce(func, wait) {
+    let timeout;
+    return function executedFunction(...args) {
+        const later = () => {
+            clearTimeout(timeout);
+            func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+    };
+}
+
+// Search suggestions
+function handleSearchSuggestions(e) {
+    const query = e.target.value.trim();
+    if (query.length < 2) return;
+    
+    // Simulate search suggestions
+    const suggestions = [
+        'Melbourne, VIC',
+        'Sydney, NSW',
+        'Brisbane, QLD',
+        'Perth, WA',
+        'Adelaide, SA'
+    ].filter(s => s.toLowerCase().includes(query.toLowerCase()));
+    
+    // Show suggestions (could be implemented as dropdown)
+    console.log('Search suggestions:', suggestions);
+}
+
+// Enhanced Property Interactions
+function initPropertyInteractions() {
+    // Add loading states for property cards
+    const propertyCards = document.querySelectorAll('.property-card');
+    propertyCards.forEach(card => {
+        card.addEventListener('click', (e) => {
+            if (e.target.closest('.property-save-btn')) return;
+            if (e.target.closest('.property-details-btn')) return;
+            
+            // Add subtle click feedback
+            card.style.transform = 'scale(0.98)';
+            setTimeout(() => {
+                card.style.transform = '';
+            }, 150);
+        });
+    });
+}
+
+// Enhanced property save functionality
+function toggleSaveProperty(button, propertyAddress) {
+    const svg = button.querySelector('svg');
+    const isSaved = button.classList.contains('saved');
+    
+    // Add loading state
+    button.style.pointerEvents = 'none';
+    
+    if (isSaved) {
+        button.classList.remove('saved');
+        svg.style.fill = 'none';
+        showToast(`Removed ${propertyAddress} from saved properties`, 'success');
+    } else {
+        button.classList.add('saved');
+        svg.style.fill = '#FF3B30';
+        showToast(`Saved ${propertyAddress} to your favorites!`, 'success');
+    }
+    
+    // Re-enable button after animation
+    setTimeout(() => {
+        button.style.pointerEvents = 'auto';
+    }, 600);
+}
+
+// Enhanced property details
+function showPropertyDetails(propertyAddress) {
+    showToast(`Loading details for ${propertyAddress}...`, 'success');
+    
+    // Simulate loading state
+    setTimeout(() => {
+        const propertyDetails = `
+            <div style="padding: 2rem; text-align: center; max-width: 800px; margin: 0 auto;">
+                <h1>${propertyAddress}</h1>
+                <div style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; margin: 2rem 0;">
+                    <h3>Property Details</h3>
+                    <p>• 4 bedrooms, 3 bathrooms</p>
+                    <p>• 2 car spaces</p>
+                    <p>• Modern kitchen with stone benchtops</p>
+                    <p>• Large backyard with garden</p>
+                    <p>• Close to schools and transport</p>
+                </div>
+                <button onclick="window.history.back()" style="background: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Back to Search</button>
+            </div>
+        `;
+        
+        document.body.innerHTML = propertyDetails;
+    }, 1000);
+}
+
+// Enhanced Toast Notifications with better UX
+function showToast(message, type = 'success') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast toast-enhanced ${type}`;
+    toast.textContent = message;
+    
+    // Add progress bar
+    const progressBar = document.createElement('div');
+    progressBar.style.cssText = `
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        height: 3px;
+        background: ${type === 'success' ? '#34C759' : '#FF3B30'};
+        width: 100%;
+        transform-origin: left;
+        animation: toastProgress 3s linear;
+    `;
+    toast.appendChild(progressBar);
+    
+    container.appendChild(toast);
+    
+    // Show toast with enhanced animation
+    requestAnimationFrame(() => {
+        toast.classList.add('show');
+    });
+    
+    // Remove toast after 3 seconds
+    setTimeout(() => {
+        toast.classList.remove('show');
+        setTimeout(() => {
+            if (toast.parentNode) {
+                toast.parentNode.removeChild(toast);
+            }
+        }, 300);
+    }, 3000);
+}
+
+// Enhanced Newsletter Subscription
+function subscribeNewsletter() {
+    const emailInput = document.querySelector('.newsletter-input input');
+    const email = emailInput.value.trim();
+    
+    if (!email) {
+        showToast('Please enter your email address', 'error');
+        return;
+    }
+    
+    if (!isValidEmail(email)) {
+        showToast('Please enter a valid email address', 'error');
+        return;
+    }
+    
+    // Simulate subscription
+    showToast('Thank you for subscribing! You\'ll receive updates soon.', 'success');
+    emailInput.value = '';
+}
+
+// Email validation helper
+function isValidEmail(email) {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+}
+
+// Enhanced search functionality
+function handleSearch() {
+    const searchInput = document.querySelector('.search-input');
+    const query = searchInput ? searchInput.value.trim() : '';
+    
+    if (!query) {
+        showToast('Please enter a location to search', 'error');
+        return;
+    }
+    
+    // Add loading state
+    const searchBtn = document.querySelector('.search-submit-btn');
+    const originalText = searchBtn.textContent;
+    searchBtn.textContent = 'Searching...';
+    searchBtn.disabled = true;
+    
+    // Simulate search redirect
+    showToast(`Searching for properties in ${query}...`, 'success');
+    
+    // Create a simple search results page simulation
+    setTimeout(() => {
+        const searchResults = `
+            <div style="padding: 2rem; text-align: center; max-width: 800px; margin: 0 auto;">
+                <h1>Search Results for "${query}"</h1>
+                <p>Found 24 properties in ${query}</p>
+                <div style="background: #f8f9fa; padding: 2rem; border-radius: 1rem; margin: 2rem 0;">
+                    <h3>Sample Properties</h3>
+                    <p>• 3-bedroom house - $850,000</p>
+                    <p>• 2-bedroom apartment - $650,000</p>
+                    <p>• 4-bedroom family home - $1,200,000</p>
+                </div>
+                <button onclick="window.history.back()" style="background: var(--primary-color); color: white; border: none; padding: 0.8rem 1.5rem; border-radius: 0.5rem; cursor: pointer;">Back to Home</button>
+            </div>
+        `;
+        
+        document.body.innerHTML = searchResults;
+    }, 1000);
+}
+
+// Enhanced AI Search functionality
+function handleAISearch() {
+    const aiInput = document.querySelector('.ai-input');
+    const query = aiInput ? aiInput.value.trim() : '';
+    
+    if (!query) {
+        showToast('Please enter your question for the AI broker', 'error');
+        return;
+    }
+    
+    // Add loading state
+    const aiBtn = document.querySelector('.ai-search-btn');
+    const originalText = aiBtn.textContent;
+    aiBtn.textContent = 'Processing...';
+    aiBtn.disabled = true;
+    
+    showToast('AI broker is analyzing your request...', 'success');
+    
+    // Simulate AI processing
+    setTimeout(() => {
+        showToast('AI response: Based on your criteria, I recommend properties in the $800k-$1.2M range with 3+ bedrooms.', 'success');
+        
+        // Reset button
+        aiBtn.textContent = originalText;
+        aiBtn.disabled = false;
+    }, 2000);
+}
+
+// Tab switching functionality
+function switchTab(tabName) {
+    const tabs = document.querySelectorAll('.search-tab');
+    const searchBar = document.querySelector('.search-bar');
+    const aiPanel = document.getElementById('ai-search-panel');
+    
+    // Remove active class from all tabs
+    tabs.forEach(tab => tab.classList.remove('active'));
+    
+    // Add active class to clicked tab
+    const activeTab = document.querySelector(`[onclick="switchTab('${tabName}')"]`);
+    if (activeTab) {
+        activeTab.classList.add('active');
+    }
+    
+    // Show/hide appropriate content
+    if (tabName === 'ai') {
+        searchBar.style.display = 'none';
+        aiPanel.style.display = 'block';
+    } else {
+        searchBar.style.display = 'flex';
+        aiPanel.style.display = 'none';
+    }
+}
+
+// Add CSS for toast progress bar
+const style = document.createElement('style');
+style.textContent = `
+    @keyframes toastProgress {
+        from { transform: scaleX(1); }
+        to { transform: scaleX(0); }
+    }
+`;
+document.head.appendChild(style);
+
+// Authentication handlers
+function handleSignIn() {
+    showToast('Sign In feature coming soon!', 'info');
+}
+
+function handleJoin() {
+    showToast('Join feature coming soon!', 'info');
+}
